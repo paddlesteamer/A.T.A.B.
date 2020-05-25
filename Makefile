@@ -3,8 +3,6 @@
 CXX=g++
 LDFLAGS=-lpthread -lbladeRF
 
-#.PHONY: directories
-
 all: directories dist/atab
 
 dist/atab: build/main.o build/utils.o build/sdr.o build/bladeRF.o
