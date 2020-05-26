@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    std::cout << "[+] Frequency: " << frequency << "\n";
+    std::cout << "[+] Initializing device with frequency " << frequency << "Hz\n";
 
     SDR *sdr;
     try {
@@ -46,6 +46,7 @@ int main(int argc, char* argv[]) {
     }
 
     uint32_t samplerate = sdr->getSampleRate();
+    frequency = sdr->getHardwareFrequency();
 
     std::cout << "[+] Initializing FFT plan\n";
     fftw_complex *in, *out;
@@ -67,7 +68,8 @@ int main(int argc, char* argv[]) {
         iirFft[i] = -140.0;
     }
 
-    std::cout << "[+] Starting...\n";
+    std::cout << "[+] Starting with frequency set to " << frequency 
+        << "Hz and with sample rate " << samplerate << "Hz...\n";
     sdr->start();
 
     double cutoff = -15.0;
