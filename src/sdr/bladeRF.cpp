@@ -45,7 +45,7 @@ void BladeRF::run() {
     // - check if this is fast enough (maybe create another thread to read samples?)
     // - test with different configuration and buffer sizes 
     // - add exit condition
-    uint16_t rawSamples[2 * BladeRF::BUFFER_SIZE];
+    int16_t rawSamples[2 * BladeRF::BUFFER_SIZE];
     std::complex<float> samples[BladeRF::BUFFER_SIZE];
     while (true) {
         // TODO: choose a reasonable timeout and move it to class constants
