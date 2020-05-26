@@ -26,10 +26,20 @@ int main(int argc, char* argv[]) {
         }
 
         frequency = vm["frequency"].as<uint64_t>();
+
     } catch (std::exception& e) {
         std::cerr << "[-] Error in command line arguments: " << e.what() << "\n";
         return -1;
     }
 
     std::cout << "[+] Frequency: " << frequency << "\n";
+
+    SDR *sdr;
+    try {
+        sdr = new BladeRF(frequency);
+
+    } catch (std::exception& e) {
+        std::cerr << "[-] BladeRF Error: " << e.what() << "\n";
+        return -1;
+    }
 }
