@@ -7,33 +7,33 @@
 BladeRF::BladeRF(uint64_t frequency) {
     int status = bladerf_open(&(this->device), "");
     if (status != 0) {
-        throw new BladeRFException(status);
+        throw BladeRFException(status);
     }
 
     status = bladerf_set_frequency(this->device, BladeRF::CHANNEL, frequency);
     if (status != 0) {
-        throw new BladeRFException(status);
+        throw BladeRFException(status);
     }
 
     status = bladerf_set_bandwidth(this->device, BladeRF::CHANNEL, BladeRF::BANDWIDTH, NULL);
     if (status != 0) {
-        throw new BladeRFException(status);
+        throw BladeRFException(status);
     }
 
     status = bladerf_set_sample_rate(this->device, BladeRF::CHANNEL, BladeRF::SAMPLERATE, NULL);
     if (status != 0) {
-        throw new BladeRFException(status);
+        throw BladeRFException(status);
     }
 
     status = bladerf_set_gain(this->device, BladeRF::CHANNEL, BladeRF::GAIN);
     if (status != 0) {
-        throw new BladeRFException(status);
+        throw BladeRFException(status);
     }
 
     status = bladerf_sync_config(this->device, BLADERF_RX_X1, BLADERF_FORMAT_SC16_Q11,
         BladeRF::NUM_BUFFERS, BladeRF::BUFFER_SIZE, BladeRF::NUM_TRANSFERS, BladeRF::STREAM_TIMEOUT);
     if (status != 0) {
-        throw new BladeRFException(status);
+        throw BladeRFException(status);
     }
 }
 
@@ -67,7 +67,7 @@ uint64_t BladeRF::getHardwareFrequency() {
 
     int status = bladerf_get_frequency(this->device, BladeRF::CHANNEL, &frequency);
     if (status != 0) {
-        throw new BladeRFException(status);
+        throw BladeRFException(status);
     }
 
     return frequency;
@@ -78,7 +78,7 @@ uint32_t BladeRF:: getSampleRate() {
 
     int status = bladerf_get_sample_rate(this->device, BladeRF::CHANNEL, &samplerate);
     if (status != 0) {
-        throw new BladeRFException(status);
+        throw BladeRFException(status);
     }
 
     return samplerate;
