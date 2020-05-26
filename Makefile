@@ -1,7 +1,7 @@
 # TODO: simplify
 
 CXX=g++
-LDFLAGS=-lpthread -lbladeRF
+LDFLAGS=-lpthread -lbladeRF -lboost_program_options
 
 all: directories dist/atab
 
