@@ -7,12 +7,12 @@
 
 class Buffer {
     public:
-        void append(std::complex<float> *in, uint32_t size);
-        void pop(std::complex<float> *out, uint32_t size);
+        void append(std::complex<double> *in, uint32_t size);
+        void pop(std::complex<double> *out, uint32_t size);
 
     private:
         std::mutex mtx;
-        std::vector< std::complex<float> > buffer;
+        std::vector< std::complex<double> > buffer;
         
 };
 

@@ -14,7 +14,7 @@ class SDR {
         virtual uint32_t getSampleRate() = 0;
 
         // fills array with samples of size FFT_WINDOW_SIZE (constants.h) 
-        void poll(std::complex<float> *samples); 
+        void poll(std::complex<double> *samples); 
         void start();
 
 

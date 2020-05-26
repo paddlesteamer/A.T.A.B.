@@ -46,16 +46,16 @@ void BladeRF::run() {
     // - test with different configuration and buffer sizes 
     // - add exit condition
     int16_t rawSamples[2 * BladeRF::BUFFER_SIZE];
-    std::complex<float> samples[BladeRF::BUFFER_SIZE];
+    std::complex<double> samples[BladeRF::BUFFER_SIZE];
     while (true) {
         // TODO: choose a reasonable timeout and move it to class constants
         bladerf_sync_rx(this->device, rawSamples, BladeRF::BUFFER_SIZE, NULL, 50);
 
         for (int j = 0; j < 2 * BladeRF::BUFFER_SIZE; j += 2) {
-            float i = ((float) rawSamples[j+1]) / BladeRF::MAX_SIGNAL_VALUE; 
-            float q = ((float) rawSamples[j]) / BladeRF::MAX_SIGNAL_VALUE; 
+            double i = ((double) rawSamples[j+1]) / BladeRF::MAX_SIGNAL_VALUE; 
+            double q = ((double) rawSamples[j]) / BladeRF::MAX_SIGNAL_VALUE; 
 
-            samples[j/2] = std::complex<float>(i, q);
+            samples[j/2] = std::complex<double>(i, q);
         }
 
         this->buffer.append(samples, BladeRF::BUFFER_SIZE);

@@ -27,7 +27,7 @@ class BladeRF: public SDR {
         static const uint NUM_TRANSFERS  = 8;
         static const uint STREAM_TIMEOUT = 1000;
 
-        static constexpr float MAX_SIGNAL_VALUE = 2048.0;
+        static constexpr double MAX_SIGNAL_VALUE = 2048.0;
 
         struct bladerf *device;
 };

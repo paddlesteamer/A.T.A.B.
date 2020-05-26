@@ -1,6 +1,6 @@
 #include "utils.h"
 
-void Buffer::append(std::complex<float>* in, uint32_t size) {
+void Buffer::append(std::complex<double>* in, uint32_t size) {
     this->mtx.lock();
 
     this->buffer.insert(this->buffer.end(), in, in + size);
@@ -8,7 +8,7 @@ void Buffer::append(std::complex<float>* in, uint32_t size) {
     this->mtx.unlock();
 }
         
-void Buffer::pop(std::complex<float> *out, uint32_t size) {
+void Buffer::pop(std::complex<double> *out, uint32_t size) {
     while (true) {
         this->mtx.lock();
 
