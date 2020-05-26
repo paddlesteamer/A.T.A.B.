@@ -52,8 +52,8 @@ void BladeRF::run() {
         bladerf_sync_rx(this->device, rawSamples, BladeRF::BUFFER_SIZE, NULL, 50);
 
         for (int j = 0; j < 2 * BladeRF::BUFFER_SIZE; j += 2) {
-            double i = ((double) rawSamples[j+1]) / BladeRF::MAX_SIGNAL_VALUE; 
-            double q = ((double) rawSamples[j]) / BladeRF::MAX_SIGNAL_VALUE; 
+            double i = ((double) rawSamples[j]) / BladeRF::MAX_SIGNAL_VALUE; 
+            double q = ((double) rawSamples[j+1]) / BladeRF::MAX_SIGNAL_VALUE; 
 
             samples[j/2] = std::complex<double>(i, q);
         }
