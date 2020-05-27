@@ -67,11 +67,9 @@ int main(int argc, char* argv[]) {
         << "Hz and with sample rate " << samplerate << "Hz...\n";
     sdr->start();
 
-    double cutoff = -15.0;
-    double max = -10000.0;
-    int maxIdx = 0;
-    double pwr_scale = 1.0 / ((double) (FFT_WINDOW_SIZE * FFT_WINDOW_SIZE));
+    double norm = 1.0 / ((double) (FFT_WINDOW_SIZE * FFT_WINDOW_SIZE));
     std::complex<double> samples[FFT_WINDOW_SIZE];
+    double shiftedFFT[FFT_WINDOW_SIZE];
     while (true) {
         sdr->poll(samples);
 
@@ -82,6 +80,8 @@ int main(int argc, char* argv[]) {
 
         fftw_execute(p);
 
+        double sum = 0.0;
+        double sqrsum = 0.0;
         for (int i = 0, idx = 0; i < FFT_WINDOW_SIZE; i++) {
             if (i < FFT_WINDOW_SIZE / 2) {
                 idx = FFT_WINDOW_SIZE / 2 + i;
@@ -89,25 +89,48 @@ int main(int argc, char* argv[]) {
                 idx = i - FFT_WINDOW_SIZE / 2;
             }
             
-            double pwr = pwr_scale * (out[idx][0] * out[idx][0] + out[idx][1] * out[idx][1]); 
-            double dB = 10.0 * log10(pwr + 1.0e-20);
+            double pwr = norm * (out[idx][0] * out[idx][0] + out[idx][1] * out[idx][1]); 
+            double dB = 10.0 * log10(pwr);
 
-            if (dB < cutoff) {
-                if (maxIdx > 0) {
-                    uint64_t trgfreq = (frequency - samplerate / 2) 
-                        + ((uint64_t) ((samplerate / FFT_WINDOW_SIZE) * (maxIdx)));
+            sum += dB;
+            sqrsum += dB * dB;
 
-                    std::cout << "[+] Peak! pwr: " << max << " idx: " << maxIdx 
-                        << " freq: " << trgfreq << "\n";
+            shiftedFFT[i] = dB;
+        }
+        double mean = sum / FFT_WINDOW_SIZE;
+        double stdev = sqrt(sqrsum / FFT_WINDOW_SIZE - mean * mean);
+        double cutoffdB = mean + stdev * PEAK_CUTOFF_SD_COUNT;
+        
+        bool found    = false;
+        double peakdB = -1000.0;
+        int peakIdx   = -1;
+        for (int i = 0; i < FFT_WINDOW_SIZE; i++) {
+            if (shiftedFFT[i] < cutoffdB) {
+                if (peakIdx >= 0) {
+                    std::cout << "[+] Peak: dB = " << peakdB << ", idx = " << peakIdx << " freq = " 
+                        << (frequency - samplerate / 2) + ((uint64_t) (samplerate / FFT_WINDOW_SIZE * peakIdx))
+                        << mean << " " << stdev << "\n";
 
-                    max = -10000.0;
-                    maxIdx = 0;
+                    found = true;
+                    peakdB = -1000.0;
+                    peakIdx = -1;
                 }
-            } else if (dB > max) {
-                max = dB;
-                maxIdx = i;
+            } else if (shiftedFFT[i] > peakdB) {
+                peakIdx = i;
+                peakdB = shiftedFFT[i];
             }
+        }
 
+        if (peakIdx >= 0) {
+            std::cout << "[+] Peak: dB = " << peakdB << ", idx = " << peakIdx << " freq = " 
+                << (frequency - samplerate / 2) + ((uint64_t) (samplerate / FFT_WINDOW_SIZE * peakIdx))
+                << "\n";
+
+            found = true;
+        }
+
+        if (found) {
+            std::cout << "\n";
         }
     }
 
