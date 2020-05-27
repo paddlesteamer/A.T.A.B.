@@ -101,6 +101,8 @@ int main(int argc, char* argv[]) {
         double stdev = sqrt(sqrsum / FFT_WINDOW_SIZE - mean * mean);
         double cutoffdB = mean + stdev * PEAK_CUTOFF_SD_COUNT;
         
+        shiftedFFT[FFT_WINDOW_SIZE/2] = mean;
+        
         bool found    = false;
         double peakdB = -1000.0;
         int peakIdx   = -1;
