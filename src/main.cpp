@@ -63,11 +63,6 @@ int main(int argc, char* argv[]) {
         window[i] = p * p;
     }
 
-    double iirFft[FFT_WINDOW_SIZE];
-    for (int i = 0; i < FFT_WINDOW_SIZE; i++) {
-        iirFft[i] = -140.0;
-    }
-
     std::cout << "[+] Starting with frequency set to " << frequency 
         << "Hz and with sample rate " << samplerate << "Hz...\n";
     sdr->start();
@@ -96,10 +91,6 @@ int main(int argc, char* argv[]) {
             
             double pwr = pwr_scale * (out[idx][0] * out[idx][0] + out[idx][1] * out[idx][1]); 
             double dB = 10.0 * log10(pwr + 1.0e-20);
-
-            iirFft[i] += dB - iirFft[i];
-
-            dB = iirFft[i];
 
             if (dB < cutoff) {
                 if (maxIdx > 0) {
