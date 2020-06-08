@@ -5,47 +5,60 @@
 
 #include "constants.h"
 #include "sdr/sdr.h"
-#include "sdr/bladeRF.h"
-#include "utils.h"
 
 namespace po = boost::program_options;
 
 int main(int argc, char* argv[]) {
-    uint64_t frequency;   
+    uint64_t frequency; 
+    uint32_t samplerate;
+    std::string source;
 
     try {
         po::options_description desc("Options");
         desc.add_options()
-            ("frequency,f", po::value<uint64_t>(), "Radio frequency to listen");
+            ("source,s", po::value<std::string>(), "Signal source bladeRF or GQRX raw file")
+            ("frequency,f", po::value<uint64_t>(), "Radio frequency to listen")
+            ("samplerate,r", po::value<uint32_t>(), "Sample rate");
 
         po::variables_map vm;
         po::store(po::parse_command_line(argc, argv, desc), vm);
         po::notify(vm);
 
+        if (vm.count("source") == 0) {
+            std::cerr << "[-] Source must be set\n";
+            return -1;
+        }
+        source = vm["source"].as<std::string>();
+
         if (vm.count("frequency") == 0) {
             std::cerr << "[-] Frequency must be set\n";
             return -1;
         }
-
         frequency = vm["frequency"].as<uint64_t>();
+
+        if (vm.count("samplerate") == 0) {
+            std::cerr << "[-] Sample rate must be set\n";
+            return -1;
+        }
+        samplerate = vm["samplerate"].as<uint32_t>();
 
     } catch (std::exception& e) {
         std::cerr << "[-] Error in command line arguments: " << e.what() << "\n";
         return -1;
     }
 
-    std::cout << "[+] Initializing device with frequency " << frequency << "Hz\n";
+    std::cout << "[+] Initializing device with frequency " << frequency
+        << " Hz and with sample rate " << samplerate << " Hz";
 
     SDR *sdr;
     try {
-        sdr = new BladeRF(frequency);
-
+        sdr = SDRFactory::newDevice(source, frequency, samplerate);
     } catch (std::exception& e) {
-        std::cerr << "[-] BladeRF Error: " << e.what() << "\n";
+        std::cerr << "[-] SDR Error: " << e.what() << "\n";
         return -1;
     }
 
-    uint32_t samplerate = sdr->getSampleRate();
+    samplerate = sdr->getSampleRate();
     frequency = sdr->getHardwareFrequency();
 
     std::cout << "[+] Initializing FFT plan\n";
@@ -57,7 +70,7 @@ int main(int argc, char* argv[]) {
     
     p = fftw_plan_dft_1d(FFT_WINDOW_SIZE, in, out, FFTW_FORWARD, FFTW_MEASURE);
 
-    double window[FFT_WINDOW_SIZE];
+    double window[FFT_WINDOW_SIZE]; // Hann window
     for (int i = 0; i < FFT_WINDOW_SIZE; i++) {
         double p = sin(i * M_PI / FFT_WINDOW_SIZE);
         window[i] = p * p;
@@ -111,7 +124,7 @@ int main(int argc, char* argv[]) {
                 if (peakIdx >= 0) {
                     std::cout << "[+] Peak: dB = " << peakdB << ", idx = " << peakIdx << " freq = " 
                         << (frequency - samplerate / 2) + ((uint64_t) (samplerate / FFT_WINDOW_SIZE * peakIdx))
-                        << mean << " " << stdev << "\n";
+                        << "\n";
 
                     found = true;
                     peakdB = -1000.0;

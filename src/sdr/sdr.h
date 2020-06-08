@@ -1,6 +1,7 @@
 #ifndef _SDR_H_
 #define _SDR_H_
 
+#include <string>
 #include <thread>
 
 #include "../utils.h"
@@ -27,6 +28,11 @@ class SDR {
     private:
         std::thread sdrTh;
 
+};
+
+class SDRFactory {
+    public:
+        static SDR* newDevice(std::string source, uint64_t frequency, uint32_t sampleRate);
 };
 
 #endif
