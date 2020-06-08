@@ -8,7 +8,7 @@
 
 class BladeRF: public SDR {
     public:
-        BladeRF(uint64_t frequency);
+        BladeRF(uint64_t frequency, uint32_t sampleRate);
         
         uint64_t getHardwareFrequency();
         uint32_t getSampleRate();
@@ -18,7 +18,6 @@ class BladeRF: public SDR {
     
     private:
         static const bladerf_bandwidth BANDWIDTH    = 1000000; // 1M 
-        static const bladerf_sample_rate SAMPLERATE = 5000000; // 5M
         static const bladerf_channel CHANNEL        = BLADERF_CHANNEL_RX(0); // RX0
         static const bladerf_gain GAIN              = 0; // no gain
 
@@ -30,6 +29,7 @@ class BladeRF: public SDR {
         static constexpr double MAX_SIGNAL_VALUE = 2048.0;
 
         struct bladerf *device;
+        struct bladerf_sample_rate;
 };
 
 class BladeRFException: public std::exception {

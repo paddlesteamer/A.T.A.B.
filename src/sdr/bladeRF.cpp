@@ -4,7 +4,7 @@
 #include "sdr.h"
 
 // BladeRF implementations
-BladeRF::BladeRF(uint64_t frequency) {
+BladeRF::BladeRF(uint64_t frequency, uint32_t sampleRate) {
     int status = bladerf_open(&(this->device), "");
     if (status != 0) {
         throw BladeRFException(status);
@@ -20,7 +20,7 @@ BladeRF::BladeRF(uint64_t frequency) {
         throw BladeRFException(status);
     }
 
-    status = bladerf_set_sample_rate(this->device, BladeRF::CHANNEL, BladeRF::SAMPLERATE, NULL);
+    status = bladerf_set_sample_rate(this->device, BladeRF::CHANNEL, sampleRate, NULL);
     if (status != 0) {
         throw BladeRFException(status);
     }
